@@ -4,24 +4,24 @@
 - debug:
     msg: "{{ pass }}"
 
-- name: Create EFS dir
+- name: Create EFS  mount directory
   file:
     state: directory
     path: /efs
 
-- name: Mount EFS
+- name: Mount EFS to directory
   command: sudo mount -t efs -o tls "{{id}}":/ efs
   args:
     chdir: /    
 
-- name: Download and unpack wordpress
+- name: Download and unpack latest wordpress
   unarchive:
     src: https://wordpress.org/latest.tar.gz
     dest: /var/www
     remote_src: true
     group: www-data
     owner: www-data
-- name: Template wordpress config
+- name: Create wordpress config from template
   template:
     src: 'wp-config.php.j2'
     dest: /var/www/wordpress/wp-config.php
@@ -29,17 +29,17 @@
     owner: www-data
     group: www-data
     backup: yes
-- name: Copy Wp-content
+- name: Copy wp-content directory to EFS 
   copy:
     remote_src: true
     src: /var/www/wordpress/wp-content
     dest: /efs
   run_once: true
-- name: Delete original directory
+- name: Delete original wp-content directory
   file:
     path: /var/www/wordpress/wp-content
     state: absent
-- name: Create symlink for EFS directory
+- name: Create symlink to wp-content directory on EFS 
   file:
     src: /efs/wp-content
     dest: /var/www/wordpress/wp-content

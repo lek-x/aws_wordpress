@@ -6,3 +6,4 @@ terraform.tfstate.backup
 .terraform/
 id_rsa_private
 id_rsa.pub
+efs.sh

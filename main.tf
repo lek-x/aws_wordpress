@@ -99,7 +99,7 @@ resource "aws_route_table" "public1" {
   }
 
   tags = {
-     Name = "pub1"
+    Name = "pub1"
   }
 }
 
@@ -121,43 +121,43 @@ resource "aws_security_group" "main" {
   vpc_id      = aws_vpc.vpc1.id
 
   ingress {
-    description       = "allow incoming ssh"
-    from_port         = 22
-    to_port           = 22
-    protocol          = "tcp"
-    cidr_blocks       = ["0.0.0.0/0"]
+    description = "allow incoming ssh"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
 
-    description        = "allow  incoming http"
-    from_port         = 80
-    to_port           = 80
-    protocol          = "tcp"
-    cidr_blocks       = ["0.0.0.0/0"]
+    description = "allow  incoming http"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-   ingress {
+  ingress {
 
-    description        = "allow all traffic inside vpc"
-    from_port         = 0
-    to_port           = 65535
-    protocol          = "tcp"
-    cidr_blocks       = [aws_vpc.vpc1.cidr_block]
+    description = "allow all traffic inside vpc"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = [aws_vpc.vpc1.cidr_block]
   }
   ingress {
-    description        = "allow icmp"
-    from_port         = -1
-    to_port           = -1
-    protocol          = "icmp"
-    cidr_blocks       = ["0.0.0.0/0"]
+    description = "allow icmp"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
 }
@@ -166,7 +166,7 @@ resource "aws_security_group" "main" {
 
 resource "aws_eip" "eip_res1" {
   instance = aws_instance.vm1.id
-  vpc = true
+  vpc      = true
   tags = {
     Name = "eip_res1"
   }
@@ -175,7 +175,7 @@ resource "aws_eip" "eip_res1" {
 
 resource "aws_eip" "eip_res2" {
   instance = aws_instance.vm2.id
-  vpc = true
+  vpc      = true
   tags = {
     Name = "eip_res1"
   }
@@ -238,7 +238,7 @@ resource "aws_instance" "vm2" {
   vpc_security_group_ids      = [aws_security_group.main.id]
   key_name                    = aws_key_pair.root.id
   tags = {
-	 Name = "node2"
+    Name = "node2"
   }
 
   connection {
@@ -271,7 +271,7 @@ resource "aws_instance" "vm2" {
 
 resource "aws_efs_file_system" "efs1" {
   creation_token = "wordpress"
-  encrypted = true
+  encrypted      = true
 
   tags = {
     Name = "wordpress"
@@ -279,24 +279,24 @@ resource "aws_efs_file_system" "efs1" {
 }
 
 resource "aws_efs_mount_target" "alpha" {
-  file_system_id = aws_efs_file_system.efs1.id
-  subnet_id      = aws_subnet.pubsub1.id
+  file_system_id  = aws_efs_file_system.efs1.id
+  subnet_id       = aws_subnet.pubsub1.id
   security_groups = [aws_security_group.main.id]
 }
 
 resource "aws_efs_mount_target" "beta" {
-  file_system_id = aws_efs_file_system.efs1.id
-  subnet_id      = aws_subnet.pubsub2.id
+  file_system_id  = aws_efs_file_system.efs1.id
+  subnet_id       = aws_subnet.pubsub2.id
   security_groups = [aws_security_group.main.id]
 }
 
 
 resource "aws_lb_target_group" "wordpress" {
-  name     = "wordpress-gr"
-  port     = 80
-  protocol = "HTTP"
+  name        = "wordpress-gr"
+  port        = 80
+  protocol    = "HTTP"
   target_type = "instance"
-  vpc_id   = aws_vpc.vpc1.id
+  vpc_id      = aws_vpc.vpc1.id
 }
 
 resource "aws_lb_target_group_attachment" "vm1" {
@@ -316,7 +316,7 @@ resource "aws_lb" "test" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.main.id]
-  subnets            = [aws_subnet.pubsub1.id,aws_subnet.pubsub2.id]
+  subnets            = [aws_subnet.pubsub1.id, aws_subnet.pubsub2.id]
 
   enable_deletion_protection = false
 
@@ -341,7 +341,7 @@ resource "aws_lb_listener" "front_end" {
 
 resource "aws_db_subnet_group" "wordpress" {
   name       = "wordpressgr"
-  subnet_ids = [aws_subnet.pubsub1.id,aws_subnet.pubsub2.id]
+  subnet_ids = [aws_subnet.pubsub1.id, aws_subnet.pubsub2.id]
 
   tags = {
     Name = "Education"
@@ -355,17 +355,17 @@ resource "random_password" "password" {
 }
 
 resource "aws_db_instance" "mysql" {
-  allocated_storage    = 20
-  engine               = "mysql"
-  engine_version       = "8.0"
-  instance_class       = "db.t2.micro"
-  db_name              = "wordpress"
-  username             = "wordpress"
-  password             = random_password.password.result
-  skip_final_snapshot  = true
+  allocated_storage               = 20
+  engine                          = "mysql"
+  engine_version                  = "8.0"
+  instance_class                  = "db.t2.micro"
+  db_name                         = "wordpress"
+  username                        = "wordpress"
+  password                        = random_password.password.result
+  skip_final_snapshot             = true
   enabled_cloudwatch_logs_exports = ["error"]
-  vpc_security_group_ids = [aws_security_group.main.id]
-  db_subnet_group_name = aws_db_subnet_group.wordpress.id
+  vpc_security_group_ids          = [aws_security_group.main.id]
+  db_subnet_group_name            = aws_db_subnet_group.wordpress.id
 }
 
 
@@ -431,13 +431,13 @@ output "db" {
 output "db_pass" {
   description = "DB address"
   value       = random_password.password.result
-  sensitive = true
+  sensitive   = true
 }
 
 output "efs_id" {
   description = "efs id"
   value       = aws_efs_file_system.efs1.id
-  sensitive = true
+  sensitive   = true
 }
 
 
@@ -447,8 +447,8 @@ output "efs_id" {
 resource "local_file" "inventory" {
   content = templatefile("${path.module}/inventory.tmpl",
     {
-      ip1 = aws_instance.vm1.public_ip,
-      ip2 = aws_instance.vm2.public_ip,
+      ip1 = aws_eip.eip_res1.public_ip,
+      ip2 = aws_eip.eip_res2.public_ip,
 
     }
   )
@@ -459,10 +459,19 @@ resource "local_file" "inventory" {
 resource "local_file" "passdb" {
   content = templatefile("${path.module}/passdb.tmpl",
     {
-      ps = random_password.password.result,
+      ps  = random_password.password.result,
       dbh = aws_db_instance.mysql.address,
       efs = aws_efs_file_system.efs1.id
     }
   )
   filename = "${path.module}/roles/wordpress_inst/vars/passdb.yaml"
+}
+
+
+resource "null_resource" "playbook" {
+  provisioner "local-exec" {
+    command = "ansible-playbook -u root -i inventory.ini --private-key ~/.ssh/${var.pvt_key}  --ssh-common-args='-o StrictHostKeyChecking=no' wordpress.yml"
+
+  }
+  depends_on = [local_file.inventory]
 }

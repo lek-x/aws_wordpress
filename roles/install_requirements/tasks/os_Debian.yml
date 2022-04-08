@@ -1,7 +1,7 @@
 # Update system  Ubuntu
 #
 #
-- name: Update the repository cache [Common, Debian family]
+- name: Install packets
   apt:
     name: "{{ item }}"
     state: present
@@ -11,50 +11,49 @@
     - php7.4
     - php7.4-fpm
     - php7.4-mysql
-    - nginx
     - build-essential
     - libwrap0-dev
     - libssl-dev
     - python3-distutils
     - mysql-client-core-8.0
-- name: Clone efs-utils
+- name: Clone AWS efs-utils from git
   git:
     repo: https://github.com/aws/efs-utils
     dest: ~/efs-utils
     clone: yes
     version: master
 
-- name: Run script
+- name: Build efs deb packet
   command: sh build-deb.sh
   args:
     chdir: ~/efs-utils/
   ignore_errors: yes
   
-- name: Find deb
+- name: Find builded deb
   find:
     paths: ~/efs-utils/build
     patterns: '*.deb'
   register: deb_files
 
-- name: Install utils
+- name: Install efs-utils
   apt:
     deb: "{{ item.path }}"
   with_items: "{{ deb_files['files'] }}"
-- name: Download py script
+- name: Download PIP install script
   get_url:
     url: https://bootstrap.pypa.io/get-pip.py
     dest: /tmp/get-pip.py
-- name: Run python script
+- name: Install PIP
   shell: sudo python3 /tmp/get-pip.py
 
-- name: Install Botocore and PyMySQL
+- name: Install Botocore and PyMySQL python packages
   pip: 
     name: "{{ item }}"
   loop:
     - PyMySQL
     - botocore  
 
-- name: Create dir for unpack
+- name: Create directory for unpack stunnel
   file:
     state: directory
     path: ~/stunnel-5.63  
@@ -66,7 +65,7 @@
 - name: Unpack stunnel
   unarchive:
     src: ~/stunnel-5.63.tar.gz
-    dest: ~/stunnel-5.63/stunnel-5.63
+    dest: ~/stunnel-5.63
     remote_src: true
 
 - name: Configure stunnel
@@ -93,5 +92,3 @@
     src: /usr/local/bin/stunnel
     dest: /bin/stunnel
     state: link
-
-
