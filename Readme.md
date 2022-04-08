@@ -3,6 +3,9 @@
 
 ## Description:
  This code deploys in one command Wordpress onto two AWS EC2 instances, with shared EFS for Wordpress content files, creates Amazon RDS (MYSQL DB), creates Application load balancer.
+
+### Attention:
+At this moment **there isn't Route53 DNS** in this code
  
 ![image](https://miro.medium.com/max/1200/1*NB8QjhhDnkjauxTgx7QjKQ.png)
 
