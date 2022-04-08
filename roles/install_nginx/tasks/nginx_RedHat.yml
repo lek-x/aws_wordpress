@@ -1,0 +1,33 @@
+# Installing and configuring NGINX+fw  for CentOS
+#
+- name: Install NGINX [Common, RHEL family]
+  yum:
+    name: nginx-1.14.1*
+    state:  present
+  notify:
+   - NGINX check status
+  tags:
+    - install_nginx
+- name: "Check packages [Common, RHEL]"
+  package_facts:
+    manager: "auto"
+  tags:
+    - install_nginx
+- name: Grant 80 port fon nginx  [Common, RHEL]
+  firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+    immediate: yes
+  tags:
+   - firwall
+   - install_nginx
+  when: "'firewall-cmd' in ansible_facts.packages"
+- name: reload fw if exists [Common, RHEL]
+  service:
+    name: firewalld
+    state: reloaded
+  tags:
+   - firwall
+   - install_nginx
+  when: "'firewall-cmd' in ansible_facts.packages"

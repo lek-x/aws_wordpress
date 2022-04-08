@@ -1,0 +1,21 @@
+# Update system
+#
+#
+- name: System Info [Common]
+  debug:
+    msg:
+    - "ip": "{{ ansible_default_ipv4.address }}"
+    - "Host": "{{ ansible_nodename }}"
+    - "OS": "{{ ansible_os_family }}"
+    - "memory":  "{{ ansible_memtotal_mb }}"
+    - "vCPU": "{{ ansible_processor_vcpus }}"
+    - "Distribution": "{{ ansible_distribution }}"
+    - "OS Family" :  "{{ ansible_os_family }}"
+  tags:
+    - update_system
+- name: Update system if OS is Debian [Common]
+  include_tasks: "os_{{ ansible_os_family }}.yml"
+  tags:
+    - update_system
+
+

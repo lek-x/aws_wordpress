@@ -1,0 +1,11 @@
+# handlers file for install_nginx
+#
+- name: NGINX reload
+  service: 
+    name: nginx 
+    state: reloaded
+- name: NGINX check status
+  systemd: 
+    name: nginx 
+    enabled: yes 
+    state: started

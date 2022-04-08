@@ -1,0 +1,9 @@
+# Update system CentOS
+#
+#
+- name: Update System packages [Common, RHEL family]
+  yum:
+   name: "*"
+   state: present
+  tags:
+    - update_system

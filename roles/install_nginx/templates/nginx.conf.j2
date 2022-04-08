@@ -1,0 +1,51 @@
+user {{ nginx_user }};
+worker_processes {{ worker_processes }};
+worker_cpu_affinity  {{ worker_affinity }};
+pid /run/nginx.pid;
+
+events {
+        {% if worker_connections | int < 1024 %} 
+        worker_connections 512 ;
+		{% elif worker_connections | int > 1000 %}
+		worker_connections 1024;
+		{% elif worker_connections | int < 512 %}
+		worker_connections 256;
+		{% endif %}
+}
+
+http {
+
+        upstream elasticsearch {
+        server 127.0.0.1:9200;
+        keepalive 15;
+  }
+
+        upstream graylog {
+        server 127.0.0.1:9000;
+        keepalive 15;
+  }
+
+			
+		server_names_hash_bucket_size 64;
+        sendfile {{ sendfile }};
+        tcp_nopush {{ tcp_nopush }};
+        tcp_nodelay {{ tcp_nodelay }};
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+
+        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+        ssl_prefer_server_ciphers on;
+
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+
+        
+        gzip on;
+        gzip_disable "msie6";
+
+        include /etc/nginx/conf.d/*.conf;
+		include /etc/nginx/sites-enabled/*.conf;
+}

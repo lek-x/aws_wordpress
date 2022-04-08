@@ -1,0 +1,34 @@
+# Update system  Ubuntu
+#
+#
+- name: Update the repository cache [Common, Debian family]
+  apt:
+    force_apt_get: true
+    update_cache: yes
+  tags:
+    - update_system
+
+- name: Update  packages [Common, Debian family]
+  apt:
+    name: "*"
+    state: latest
+  tags:
+    - update_system
+
+- name: Remove Apache2
+  apt:
+    name: apache2
+    state: absent
+
+- name: Upgrade System packages [Common, Debian family]
+  apt:
+    force_apt_get: true
+    upgrade: dist
+  tags:
+    - update_system
+
+- name: Install python3-apt
+  apt:
+    name: python3-apt
+    state: present
+

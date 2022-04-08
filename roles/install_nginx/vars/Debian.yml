@@ -1,0 +1,15 @@
+# vars file for install_nginx
+#
+listen_http: 80
+sendfile: "on"
+tcp_nopush: "on"
+tcp_nodelay: "on"
+owner: www-data
+group: www-data  
+nginx_user: www-data
+worker_processes: "{{ ansible_processor_vcpus | int}}"
+worker_connections: "{{ ansible_memtotal_mb | int}}"
+worker_affinity: auto
+server_name: _
+path_nginx_sitesaval: /etc/nginx/sites-available/
+path_nginx_sitesenab: /etc/nginx/sites-enabled/

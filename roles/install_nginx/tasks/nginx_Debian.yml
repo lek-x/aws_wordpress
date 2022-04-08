@@ -1,0 +1,38 @@
+# Installing and configuring NGINX+fw  for Ubuntu
+#    
+- name: Install NGINX  [Common, Debian family]
+  apt:
+   name: nginx
+   state: present
+  notify:
+   - NGINX check status
+  tags:
+    - install_nginx
+- name: Install apache2-utils
+  apt:
+    name: apache2-utils
+    state: present    
+    
+- name: "Check packages"
+  package_facts:
+    manager: "auto"
+  tags:
+    - install_nginx
+- name: Grant 80 port fon nginx [Common, Debian family]
+  ufw:
+    rule: allow
+    port: '80'
+    proto: tcp
+  when: "ansible_facts['os_family'] == 'Debian' and 'uwf' in ansible_facts.packages"
+  tags:
+   - firewall
+   - install_nginx
+- name: Grant 443 port fon nginx [Common, Debian family]
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+  when: "ansible_facts['os_family'] == 'Debian' and 'uwf' in ansible_facts.packages"
+  tags:
+   - firewall
+   - install_nginx

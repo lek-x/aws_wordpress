@@ -1,0 +1,9 @@
+- name: "Setting up wordpress"
+  hosts: all
+  gather_facts: true
+  become: true
+  roles:
+    - update_system
+    - install_requirements
+    - wordpress_inst
+    - install_nginx

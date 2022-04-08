@@ -1,0 +1,71 @@
+# Task file for install_nginx
+###
+###
+- name: Install nginx
+  include_tasks: "nginx_{{ ansible_os_family }}.yml"
+  tags:
+    - install_nginx
+- name: Include vars [Common]
+  include_vars: "{{ ansible_os_family }}.yml"
+  tags:
+    - install_nginx
+- name: Template for nginx [Common]
+  template:
+    src: 'nginx.conf.j2'
+    dest: /etc/nginx/nginx.conf
+    mode: '0644'
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    backup: yes
+  tags:
+    - install_nginx
+  notify:
+    - NGINX reload
+    - NGINX check status  
+- name: Remove default nginx site conf [Common]
+  file:
+    path: "{{ item }}default"
+    state: absent
+  loop:
+    -  "{{ path_nginx_sitesaval }}"
+    -  "{{ path_nginx_sitesenab }}"    
+  tags:
+    - install_nginx
+  notify:
+    - NGINX reload
+    - NGINX check status
+- name: Template graylog virt.server
+  template:
+    src: "wordpress.conf.j2"
+    dest: "{{ path_nginx_sitesaval }}wordpress.conf"
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    backup: yes
+  notify:
+    - NGINX reload
+    - NGINX check status 
+  tags:
+    - install_nginx 
+
+- name: Find conf files [WebSrv]
+  find:
+    paths: "{{ path_nginx_sitesaval }}"
+    patterns: "*.conf"
+    recurse: yes
+  register: "file_to_find"
+  tags:
+    - install_nginx
+- name: Creating symlinks 
+  file:
+    src: "{{ item.path }}"
+    dest: "{{ path_nginx_sitesenab }}{{ item.path | basename }}"
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    state: link
+    force: yes
+  loop: "{{ file_to_find.files }}"
+  notify:
+    - NGINX reload
+    - NGINX check status
+  tags:
+    - install_nginx

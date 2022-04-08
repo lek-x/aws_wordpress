@@ -1,0 +1,48 @@
+---
+- include_vars:
+    file: vars/passdb.yaml
+- debug:
+    msg: "{{ pass }}"
+
+- name: Create EFS dir
+  file:
+    state: directory
+    path: /efs
+
+- name: Mount EFS
+  command: sudo mount -t efs -o tls "{{id}}":/ efs
+  args:
+    chdir: /    
+
+- name: Download and unpack wordpress
+  unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: /var/www
+    remote_src: true
+    group: www-data
+    owner: www-data
+- name: Template wordpress config
+  template:
+    src: 'wp-config.php.j2'
+    dest: /var/www/wordpress/wp-config.php
+    mode: '0644'
+    owner: www-data
+    group: www-data
+    backup: yes
+- name: Copy Wp-content
+  copy:
+    remote_src: true
+    src: /var/www/wordpress/wp-content
+    dest: /efs
+  run_once: true
+- name: Delete original directory
+  file:
+    path: /var/www/wordpress/wp-content
+    state: absent
+- name: Create symlink for EFS directory
+  file:
+    src: /efs/wp-content
+    dest: /var/www/wordpress/wp-content
+    state: link
+    owner: www-data
+    group: www-data
