@@ -11,7 +11,11 @@
 - name: Install apache2-utils
   apt:
     name: apache2-utils
-    state: present    
+    state: present
+- name: Remove apache2
+  apt:
+    name: apache2
+    state: absent     
     
 - name: "Check packages"
   package_facts:

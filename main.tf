@@ -6,10 +6,16 @@ provider "aws" {
 }
 
 
-###Upload netw ssh pub key
-resource "aws_key_pair" "root" {
-  key_name   = "terraform"
-  public_key = file("${path.module}/id_rsa.pub")
+####Upload netw ssh pub key
+#resource "aws_key_pair" "root" {
+#  key_name   = "terraform"
+#  public_key = file("${path.module}/id_rsa.pub")
+#}
+
+
+data "aws_key_pair" "mykey" {
+  key_name = var.keyname
+
 }
 
 ######NETWORK BLOCK ###########
@@ -196,7 +202,7 @@ resource "aws_instance" "vm1" {
   subnet_id                   = aws_subnet.pubsub1.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.main.id]
-  key_name                    = aws_key_pair.root.id
+  key_name                    = data.aws_key_pair.mykey.key_name
   tags = {
     Name = "node1"
   }
@@ -204,7 +210,7 @@ resource "aws_instance" "vm1" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("${path.module}/id_rsa_private")
+    private_key = file(var.pvt_key)
     host        = self.public_ip
   }
 
@@ -236,7 +242,7 @@ resource "aws_instance" "vm2" {
   subnet_id                   = aws_subnet.pubsub2.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.main.id]
-  key_name                    = aws_key_pair.root.id
+  key_name                    = data.aws_key_pair.mykey.key_name
   tags = {
     Name = "node2"
   }
@@ -244,7 +250,7 @@ resource "aws_instance" "vm2" {
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("${path.module}/id_rsa_private")
+    private_key = file(var.pvt_key)
     host        = self.public_ip
   }
 
@@ -470,7 +476,7 @@ resource "local_file" "passdb" {
 
 resource "null_resource" "playbook" {
   provisioner "local-exec" {
-    command = "ansible-playbook -u root -i inventory.ini --private-key ~/.ssh/${var.pvt_key}  --ssh-common-args='-o StrictHostKeyChecking=no' wordpress.yml"
+    command = "ansible-playbook -u root -i inventory.ini --private-key ${var.pvt_key}  --ssh-common-args='-o StrictHostKeyChecking=no' wordpress.yml"
 
   }
   depends_on = [local_file.inventory]

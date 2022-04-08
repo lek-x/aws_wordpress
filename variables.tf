@@ -13,6 +13,12 @@ variable "inst_type" {
 }
 
 variable "pvt_key" {
-  description = "name ssh key"
+  description = "Enter full path to your Private key for AWS EC2"
+  type        = string
+}
+
+
+variable "keyname" {
+  description = "enter name of your existing ssh key on AWS PLATFORM"
   type        = string
 }
